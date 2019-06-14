@@ -1,11 +1,11 @@
 
 
 
-Publishers
+I. Publishers
 
 Publishers allow a node to send messages to a topic:
 
-define:
+Define:
 ros::Publisher pub1 = n.advertise<message_type>("/topic_name", queue_size);
 
 - pub1 object allows to publish messages by publish() 
@@ -16,7 +16,7 @@ ros::Publisher pub1 = n.advertise<message_type>("/topic_name", queue_size);
 
 - message_type e.g. std_msgs::String or std_msgs::Float64
 
-execute:
+Call:
 pub1.publish(msg);
 
 
@@ -86,6 +86,31 @@ target_link_libraries(simple_mover ${catkin_LIBRARIES})
 add_dependencies(simple_mover simple_arm_generate_messages_cpp)
 
 
+II. Services:
+
+A service allows request/response communication between nodes.
+
+Define:
+ros::ServiceServer service = n.advertiseService(`service_name`, handler);
+
+- node handle n allows to communicate with ROS 
+
+- advertiseService() informs ROS that you want to create a service
+
+- handler is the name of the function that handles the incoming service message
+
+Call:
+Services can be called directly from the command line, with:
+
+$ rosservice call service_name “request”
+
+Or by the ServiseClient, provides interface for sending messages to the service:
+
+ros::ServiceClient client = n.serviceClient<package_name::service_file_name>("service_name");
+
+client.call(srv);
+
+Definitions of request/response messages are contained within .srv files.
 
 
 
