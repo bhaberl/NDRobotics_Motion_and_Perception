@@ -20,56 +20,7 @@ Call:
 pub1.publish(msg);
 
 
-SourceCode Example Node:
-
 gedit simple_mover.cpp
-
-#include "ros/ros.h"
-#include "std_msgs/Float64.h"
-
-int main(int argc, char** argv)
-{
-    // Initialize the arm_mover node
-    ros::init(argc, argv, "arm_mover");
-
-    // Create a handle to the arm_mover node, which permits it to communicate with the ROS Master
-    ros::NodeHandle n;
-
-    // Create a publisher that can publish a std_msgs::Float64 message on the /simple_arm/joint_1_position_controller/command topic
-    ros::Publisher joint1_pub = n.advertise<std_msgs::Float64>("/simple_arm/joint_1_position_controller/command", 10);
-    // Create a publisher that can publish a std_msgs::Float64 message on the /simple_arm/joint_2_position_controller/command topic
-    ros::Publisher joint2_pub = n.advertise<std_msgs::Float64>("/simple_arm/joint_2_position_controller/command", 10);
-
-    // Set loop frequency of 10Hz
-    ros::Rate loop_rate(10);
-
-    int start_time, elapsed;
-
-    // Get ROS start time
-    while (not start_time) {
-        start_time = ros::Time::now().toSec();
-    }
-
-    while (ros::ok()) {
-        // Get ROS elapsed time
-        elapsed = ros::Time::now().toSec() - start_time;
-
-        // Set the arm joint angles
-        std_msgs::Float64 joint1_angle, joint2_angle;
-        joint1_angle.data = sin(2 * M_PI * 0.1 * elapsed) * (M_PI / 2);
-        joint2_angle.data = sin(2 * M_PI * 0.1 * elapsed) * (M_PI / 2);
-
-        // Publish the arm joint angles
-        joint1_pub.publish(joint1_angle);
-        joint2_pub.publish(joint2_angle);
-
-        // Sleep for the time remaining until 10 Hz is reached
-        loop_rate.sleep();
-    }
-
-    return 0;
-}
-
 
 Source it via CMakeLists.txt
 
@@ -112,16 +63,49 @@ client.call(srv);
 
 Definitions of request/response messages are contained within .srv files.
 
+gedit GoToPosition.srv
 
+//request message
+float64 joint_1
+float64 joint_2
+---
+//response message
+string msg_feedback
 
+Source via CMakeLists
 
+add_service_files(
+   FILES
+   GoToPosition.srv
+)
+generate_messages(
+   DEPENDENCIES
+   std_msgs  # Or other packages containing msgs
+)
+add_compile_options(-std=c++11)
 
+package.xml defines package’s properties, such as package-name, version numbers, authors and dependencies(rosdep)
 
+<buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
 
+  <run_depend>controller_manager</run_depend>
+  <run_depend>effort_controllers</run_depend>
+  <run_depend>gazebo_plugins</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>joint_state_controller</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>xacro</run_depend>
+  
+  Verify if ROS can see srv:
+  rossrv show GoToPosition
+  
+  gedit arm_mover.cpp
 
-
-
-
+  
 
 
 
