@@ -2,52 +2,37 @@
 <?xml version="1.0"?>
 
 <robot name="my_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <!-- CONSTANTS -->
-
-    <xacro:property name="pi" value="3.1415926535897931" />
-
-    <!-- Multiplicative factor applied to the radius of the caster balls
-         for them not to stop both wheels to be touching the ground at
-         the same time                                               -->
-    <xacro:property name="reduction_factor_caster_radius" value="0.998" />
-
-    <!-- PARAMETERS -->
-
-    <!-- Base parameters -->
+	
+	<xacro:include filename="$(find my_robot)/urdf/my_robot.gazebo" />
+	
+    
+	<!-- parameters -->
+	
     <xacro:property name="base_radius" value="0.4" />
-    <!-- base height must be inside (wheel_radius, 2*wheel_radius) -->
-    <!-- note that the extremes of the interval are not included   -->
     <xacro:property name="base_height" value="0.15" />
     <xacro:property name="base_mass" value="15.0" />
-
-    <!-- Wheel parameters -->
+	<xacro:property name="reduction_factor_caster_radius" value="0.998" />
+	
     <xacro:property name="wheel_radius" value="0.1" />
     <xacro:property name="wheel_length" value="0.05" />
     <xacro:property name="wheel_mass" value="5.0" />
-
     <xacro:property name="z_offset_between_centers" value="${wheel_radius - base_height/2}" />
-
-    <!-- Camera parameters -->
+    
     <xacro:property name="camera_edge_length" value="0.05" />
     <xacro:property name="camera_mass" value="0.1" />
 
-    <!-- Lidar parameters -->
     <xacro:property name="lidar_edge_length" value="0.1" />
     <xacro:property name="lidar_mass" value="1e-5" />
-
-    <!-- Sensor's base parameters -->
+	
     <xacro:property name="sensors_base_heigth" value="${1.5*camera_edge_length}" />
     <xacro:property name="sensors_base_mass" value="5.0" />
     <xacro:property name="sensors_base_offset_z" value="${base_height/2 + sensors_base_heigth/2}" />
+	
+	<xacro:property name="pi" value="3.1415926535897931" />
 
-	<!-- INCLUDE -->
-	<xacro:include filename="$(find my_robot)/urdf/my_robot.gazebo" />
 	
-    <!-- MACROS -->
-	
-	 <!-- Inertial of a cylinder -->
-    <xacro:macro name="cylinder_inertial" params="mass radius length">
+    <!-- macro definitions -->
+	<xacro:macro name="cylinder_inertial" params="mass radius length">
         <inertial>
             <mass value="${mass}" />
             <inertia
@@ -58,7 +43,6 @@
         </inertial>
     </xacro:macro>
 
-    <!-- Inertial of a cube -->
     <xacro:macro name="cube_inertial" params="mass edge_length">
         <inertial>
             <mass value="${mass}" />
@@ -70,7 +54,7 @@
         </inertial>
     </xacro:macro>
 
-    <!-- ROBOT DESCRIPTION-->
+    <!-- robot -->
 
     <link name="robot_footprint"></link>
 
@@ -146,7 +130,7 @@
 
     </link>
 
-    <!-- WHEELS -->
+    <!-- wheels -->
 
 	<link name="left_wheel">
 		<xacro:cylinder_inertial
@@ -242,7 +226,7 @@
         <dynamics damping="1.0" friction="1.0" />
     </joint>
 
-    <!-- Camera -->
+    <!-- camera -->
     <link name="camera">
         <xacro:cube_inertial mass="${camera_mass}" edge_length="${camera_edge_length}" />
 
@@ -268,7 +252,7 @@
         <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
 
-    <!-- Lidar -->
+    <!-- lidar -->
     <link name="hokuyo">
         <xacro:cube_inertial mass="${lidar_mass}" edge_length="${lidar_edge_length}" />
 
@@ -296,7 +280,5 @@
         <child link="hokuyo" />
         <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
-
-    <!-- </ROBOT DESCRIPTION> -->
 
 </robot>
