@@ -21,7 +21,6 @@ public:
 
 void ImageProcessor::drive_robot(float linear_x, float angular_z)
 {
-    ROS_INFO_STREAM("CALL DRIVE_ROBOT");
     // Request velocities 
     ball_chaser::DriveToTarget srv;
     srv.request.linear_x = linear_x;
@@ -33,37 +32,38 @@ void ImageProcessor::drive_robot(float linear_x, float angular_z)
 
 void ImageProcessor::process_image_callback(const sensor_msgs::Image& img)
 {
-    //ROS_INFO_STREAM("START IMAGE PROCESSING");   
     int white_pixel = 255;
     float white_pixel_x;
     float linear_x = 0.0;
     float angular_z = 0.0;
-    //ROS_INFO_STREAM(img.height);
-    //ROS_INFO_STREAM(img.width);
-	
+   	
     for (int row = 0; row < img.height; row++)
     {
-        for (int column = 0; column < (img.width-3); column+=3)
-	{
-            int pixel = row * img.width + column;
-	    //ROS_INFO_STREAM(img.data[pixel]);
-            if ((img.data[pixel] == white_pixel) && (img.data[pixel+1] == white_pixel) && (img.data[pixel+2] == white_pixel))
+        for (int column = 0; column < (img.step-3); column+=3)
+		{
+		int pixel = row * img.step + column;
+		if ((img.data[pixel] == white_pixel) && (img.data[pixel+1] == white_pixel) && (img.data[pixel+2] == white_pixel))
 	    {
-                white_pixel_x = static_cast<float>(column);
-		ROS_INFO_STREAM("FOUND WHITE PIXEL");
-		ROS_INFO_STREAM(white_pixel_x);
-                if (white_pixel_x < img.width / 3) {
-		    linear_x = 0.0;
-		    angular_z = -0.5;
-                } else if (white_pixel_x > img.width / 1.5) {
-                    linear_x = 0.0;
-		    angular_z = 0.5;
-                } else {
-                    linear_x = 0.2;
-		    angular_z = 0.0;
-                }
-		drive_robot(linear_x, angular_z);
-                return;
+			white_pixel_x = static_cast<float>(column);
+			ROS_INFO_STREAM("FOUND WHITE PIXEL");
+			ROS_INFO_STREAM(white_pixel_x);
+			if (white_pixel_x < img.step / 3)
+			{
+				linear_x = 0.0;
+				angular_z = -0.5;
+			}
+			else if (white_pixel_x > img.step / 1.5)
+			{
+                linear_x = 0.0;
+				angular_z = 0.5;
+			}
+			else
+			{
+                linear_x = 0.2;
+				angular_z = 0.0;
+            }
+			drive_robot(linear_x, angular_z);
+			return;
             }
         }
     }    
